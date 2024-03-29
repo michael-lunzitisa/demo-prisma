@@ -13,11 +13,99 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id            Int @id @default(autoincrement())
-  name          String?
-  email         String @unique
-  password      String?
-  created_at    DateTime @default(now())
+model Apprenant {
+  id              Int @id @default(autoincrement())
+  matricule       String    @unique
+  prenom          String
+  sexe            String
+  nom             String
+  postnom         String
+  date_de_naissance  DateTime
+  adresse         String
+  email           String @unique
+  telephone       String
+  cohorte  Cohorte @relation(fields: [cohorteId], references: [id])
+  session  Session @relation(fields: [sessionId], references: [id])
+  machine  Machine @relation(fields: [machineId], references: [id])
+  machineId Int
+  sessionId Int
+  cohorteId Int
 }
 
+model Cohorte {
+  id Int @id @default(autoincrement())
+  nom String
+  date_debut DateTime
+  date_fin DateTime
+  apprenant Apprenant []
+  // session  Session @relation(fields: [sessionId], references: [id])
+  // sessionId Int
+
+  affecter Affecter []
+  
+
+}
+
+model Session {
+  id Int @id @default(autoincrement())
+  nom String
+  ville String
+  duree String
+  creneau String
+  date DateTime
+  place_disponible Int
+  heure DateTime
+  apprenant Apprenant []
+  animer Animer []
+  utiliser Utiliser []
+ 
+}
+
+model Animer{
+   id Int @id @default(autoincrement())
+   coach Coach @relation(fields: [coachId], references: [id])
+   session Session @relation(fields: [sessionId], references: [id])
+   coachId Int
+   sessionId Int
+}
+
+model Machine{
+  id Int @id @default(autoincrement())
+  type String
+  fabriquant String
+  modele String
+  numero_serie String
+  apprenant Apprenant []
+  utiliser Utiliser []
+}
+
+model Utiliser {
+    id Int @id @default(autoincrement())
+    machine Machine @relation(fields: [machineId], references: [id])
+    session Session @relation(fields: [sessionId], references: [id])
+    sessionId Int
+    machineId Int
+}
+
+model Coach{
+  id Int @id @default(autoincrement())
+  nom String
+  prenom String
+  sexe String
+  email String @unique
+  adresse String
+  expertise String
+  date_de_naissance DateTime
+  telephone String
+  animer Animer[]
+  affecter Affecter []
+  
+}
+
+model Affecter {
+  id Int @id @default(autoincrement())
+  coach Coach @relation(fields: [coachId], references: [id])
+  cohorte Cohorte @relation(fields: [cohorteId], references: [id])
+  cohorteId Int
+  coachId Int
+}
